@@ -16,6 +16,11 @@ Set Theme "Charm"
 Set Padding 20
 Set LetterSpacing 0
 
+# Clean startup
+Type "clear"
+Enter
+Sleep 0.5s
+
 # Start CronTUI
 Type "crontui"
 Enter
@@ -30,7 +35,7 @@ Sleep 1s
 # Open Month Heatmap (option m)
 Type "m"
 Sleep 1.5s
-# Enter month (e.g. June/Juni)
+# Enter month
 Type "June"
 Enter
 Sleep 4s
@@ -46,3 +51,7 @@ Sleep 1s
 # Exit TUI
 Type "0"
 Sleep 1.5s
+
+# End pause for smooth GIF loop
+Sleep 1.5s
+
