@@ -19,9 +19,14 @@ BLUE='\033[0;34m'
 CYAN='\033[0;36m'
 NC='\033[0m'
 
-# Configurable paths via environment variables
-LOG_DIR="${CRONTUI_LOG_DIR:-/var/lib/cron-notify}"
-DIGEST_FILE="${CRONTUI_DIGEST_FILE:-/var/lib/cron-notify/runs.tsv}"
+# Load configuration files if they exist
+[ -f "/etc/crontui/config" ] && source "/etc/crontui/config"
+[ -f "$HOME/.config/crontui/config" ] && source "$HOME/.config/crontui/config"
+
+# Configurable paths via environment variables or configuration files
+LOG_DIR="${CRONTUI_LOG_DIR:-${LOG_DIR:-/var/lib/cron-notify}}"
+DIGEST_FILE="${CRONTUI_DIGEST_FILE:-${DIGEST_FILE:-/var/lib/cron-notify/runs.tsv}}"
+
 
 expand_field() {
     local val="$1"
@@ -864,73 +869,75 @@ run_doctor() {
     fi
 }
 
-case "$1" in
-    -h|--help)
-        show_help
-        exit 0
-        ;;
-    -v|--version)
-        show_version
-        exit 0
-        ;;
-    -d|--doctor)
-        run_doctor
-        exit 0
-        ;;
-    "")
-        # No arguments, proceed to main loop
-        ;;
-    *)
-        echo -e "${RED}Unknown option: $1${NC}"
-        show_help
-        exit 1
-        ;;
-esac
-
-# Main Loop
-while true; do
-    clear
-    echo -e "${CYAN}==========================================${NC}"
-    echo -e "${YELLOW}        CRONTUI - CRON MANAGEMENT         ${NC}"
-    echo -e "${CYAN}==========================================${NC}"
-    echo -e "  1) View Active Cronjobs"
-    echo -e "  2) Add Cronjob"
-    echo -e "  3) Remove Cronjob"
-    echo -e "  4) Test-Run Cronjob"
-    echo -e "  5) View Cron Logs"
-    if [ -f "$DIGEST_FILE" ]; then
-        echo -e "  6) View Cron-Digest Report"
-    fi
-    echo -e "  7) Run Healthcheck"
-    echo -e "  8) Week Timeline view"
-    echo -e "  9) Day Zoom view"
-    echo -e "  m) Month Heatmap calendar"
-    echo -e "  j) Year Heatmap calendar"
-    echo -e ""
-    echo -e "  0) Exit"
-    echo -e "${CYAN}==========================================${NC}"
-    read -n 1 -p "Enter choice: " choice
-    echo ""
-
-    case $choice in
-        1) cron_view ;;
-        2) cron_add ;;
-        3) cron_remove ;;
-        4) cron_test ;;
-        5) cron_logs ;;
-        6) 
-            if [ -f "$DIGEST_FILE" ]; then
-                cron_digest
-            else
-                echo -e "${RED}Invalid choice!${NC}"; sleep 1
-            fi
+if [ "${BASH_SOURCE[0]}" = "$0" ]; then
+    case "$1" in
+        -h|--help)
+            show_help
+            exit 0
             ;;
-        7) cron_health ;;
-        8) cron_timeline_week ;;
-        9) cron_zoom_day ;;
-        m|M) cron_month_view ;;
-        j|J) cron_year_view ;;
-        0) echo "Goodbye!"; exit 0 ;;
-        *) echo -e "${RED}Invalid choice!${NC}"; sleep 1 ;;
+        -v|--version)
+            show_version
+            exit 0
+            ;;
+        -d|--doctor)
+            run_doctor
+            exit 0
+            ;;
+        "")
+            # No arguments, proceed to main loop
+            ;;
+        *)
+            echo -e "${RED}Unknown option: $1${NC}"
+            show_help
+            exit 1
+            ;;
     esac
-done
+
+    # Main Loop
+    while true; do
+        clear
+        echo -e "${CYAN}==========================================${NC}"
+        echo -e "${YELLOW}        CRONTUI - CRON MANAGEMENT         ${NC}"
+        echo -e "${CYAN}==========================================${NC}"
+        echo -e "  1) View Active Cronjobs"
+        echo -e "  2) Add Cronjob"
+        echo -e "  3) Remove Cronjob"
+        echo -e "  4) Test-Run Cronjob"
+        echo -e "  5) View Cron Logs"
+        if [ -f "$DIGEST_FILE" ]; then
+            echo -e "  6) View Cron-Digest Report"
+        fi
+        echo -e "  7) Run Healthcheck"
+        echo -e "  8) Week Timeline view"
+        echo -e "  9) Day Zoom view"
+        echo -e "  m) Month Heatmap calendar"
+        echo -e "  j) Year Heatmap calendar"
+        echo -e ""
+        echo -e "  0) Exit"
+        echo -e "${CYAN}==========================================${NC}"
+        read -n 1 -p "Enter choice: " choice
+        echo ""
+
+        case $choice in
+            1) cron_view ;;
+            2) cron_add ;;
+            3) cron_remove ;;
+            4) cron_test ;;
+            5) cron_logs ;;
+            6) 
+                if [ -f "$DIGEST_FILE" ]; then
+                    cron_digest
+                else
+                    echo -e "${RED}Invalid choice!${NC}"; sleep 1
+                fi
+                ;;
+            7) cron_health ;;
+            8) cron_timeline_week ;;
+            9) cron_zoom_day ;;
+            m|M) cron_month_view ;;
+            j|J) cron_year_view ;;
+            0) echo "Goodbye!"; exit 0 ;;
+            *) echo -e "${RED}Invalid choice!${NC}"; sleep 1 ;;
+        esac
+    done
+fi

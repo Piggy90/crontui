@@ -20,13 +20,22 @@ A beautiful, dependency-free terminal-based visualizer and manager for your cron
 
 ---
 
-## 📽️ Demo
+## 📽️ Demo & Showcase
 
 *(To capture an animated demo of CronTUI, run `asciinema rec demo.cast`, convert it using `svg-term` or compile to a GIF, and embed it here!)*
 
 ```text
 [   Interactive Demo / GIF Placeholder   ]
 ```
+
+### 📆 Week Timeline
+Shows a horizontal weekly grid mapped to specific hour slots when jobs run. Ideal for recognizing scheduling density across different days.
+
+### 🔍 Day Zoom View
+A detailed hour-by-hour minute timeline showing precisely when jobs run (down to the minute) alongside consolidated command labels.
+
+### 📅 Month & Year Heatmaps
+A calendar representation (rendered in standard 3x4 columns for the yearly view) using color-coded densities (`■`) to highlight active cron days.
 
 ---
 
@@ -59,6 +68,24 @@ You can install `CronTUI` as a single executable script in seconds.
 ```bash
 curl -sSL https://raw.githubusercontent.com/Piggy90/crontui/main/crontui | sudo tee /usr/local/bin/crontui && sudo chmod +x /usr/local/bin/crontui
 ```
+
+### Homebrew (macOS / Linux)
+You can install CronTUI via Homebrew:
+```bash
+brew tap Piggy90/crontui
+brew install crontui
+```
+
+### Debian/Ubuntu (.deb Package)
+Download or build a `.deb` package for native package management:
+1. Build the `.deb` package:
+   ```bash
+   ./build_deb.sh
+   ```
+2. Install the package:
+   ```bash
+   sudo dpkg -i crontui_1.0.0_all.deb
+   ```
 
 ### Manual Installation
 1. Clone this repository:
@@ -107,16 +134,62 @@ Summary: 0 error(s), 0 warning(s)
 
 ---
 
-## ⚙️ Configuration (Optional)
+## ⚙️ Configuration
 
-`CronTUI` supports custom log directories and cron-digest run reports via environment variables.
+`CronTUI` can be configured using environment variables or a local configuration file. 
+
+### Configuration Files
+CronTUI automatically loads variables from these locations if they exist:
+- System-wide: `/etc/crontui/config`
+- User-specific: `~/.config/crontui/config`
+
+Format example for `~/.config/crontui/config`:
+```bash
+LOG_DIR="/var/lib/cron-notify"
+DIGEST_FILE="/var/lib/cron-notify/runs.tsv"
+```
+
+### Environment Variables
+Environment variables override settings defined in configuration files:
 
 | Variable | Description | Default |
 | :--- | :--- | :--- |
 | `CRONTUI_LOG_DIR` | Directory containing individual task logs (e.g. `*.last.log`). | `/var/lib/cron-notify` |
-| `CRONTUI_DIGEST_FILE` | Path to a tab-separated TSV file logging cron runs (formatted as `Timestamp\tTask\tStatus\tDuration`). | `/var/lib/cron-notify/runs.tsv` |
+| `CRONTUI_DIGEST_FILE` | Path to a tab-separated TSV file logging cron runs. | `/var/lib/cron-notify/runs.tsv` |
 
 If these files/directories are not present, `CronTUI` will automatically fall back to showing standard system logs via `journalctl` or `/var/log/syslog`.
+
+---
+
+## 🧪 Test Suite
+
+CronTUI includes an automated test suite to ensure its parser, calendar calculations, and helpers are working correctly. 
+
+Run the test suite:
+```bash
+./test.sh
+```
+
+Example test output:
+```text
+Running CronTUI Unit Tests...
+============================================================
+✔ PASS: dow_to_name 1 -> Mon
+✔ PASS: dow_to_name 7 -> Sun
+✔ PASS: dow_to_name 0 -> Sun
+✔ PASS: dow_to_name 6 -> Sat
+✔ PASS: in_list 3 in '1 2 3 4' -> true (0)
+✔ PASS: in_list 5 in '1 2 3 4' -> false (1)
+✔ PASS: expand_field */6 max 23
+✔ PASS: expand_field 1-5 max 7
+✔ PASS: expand_field 1,3,5 max 7
+✔ PASS: expand_field * max 3
+✔ PASS: get_job_label with --success flag
+✔ PASS: get_job_label with CRON_DIGEST_LABEL
+✔ PASS: get_job_label fallback to basename
+============================================================
+Summary: 13 passed, 0 failed
+```
 
 ---
 
@@ -145,6 +218,7 @@ Contributions are welcome! To contribute:
 - Keep the main runner 100% self-contained in the `crontui` script.
 - Ensure Python helpers use only the standard library (no pip packages).
 - Verify shell syntax using `bash -n crontui` before committing.
+- Run unit tests with `./test.sh` and ensure all pass before submitting a PR.
 
 ## 📄 License
 
