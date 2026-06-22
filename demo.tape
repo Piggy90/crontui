@@ -45,6 +45,9 @@ Sleep 1s
 
 # 4. Open Day Zoom view (option 9)
 Type "9"
+Sleep 1.5s
+Type "Mon"
+Enter
 Sleep 4.5s
 Enter
 Sleep 1s
