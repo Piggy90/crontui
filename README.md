@@ -22,11 +22,7 @@ A beautiful, dependency-free terminal-based visualizer and manager for your cron
 
 ## 📽️ Demo & Showcase
 
-*(To capture an animated demo of CronTUI, run `asciinema rec demo.cast`, convert it using `svg-term` or compile to a GIF, and embed it here!)*
-
-```text
-[   Interactive Demo / GIF Placeholder   ]
-```
+![CronTUI Demo](demo.gif)
 
 ### 📆 Week Timeline
 Shows a horizontal weekly grid mapped to specific hour slots when jobs run. Ideal for recognizing scheduling density across different days.

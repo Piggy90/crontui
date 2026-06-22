@@ -12,7 +12,7 @@ Set FontSize 14
 Set FontFamily "DejaVu Sans Mono"
 Set Width 900
 Set Height 650
-Set Theme "Charm"
+Set Theme "Chalk"
 Set Padding 20
 Set LetterSpacing 0
 
