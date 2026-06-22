@@ -1,8 +1,41 @@
 # CronTUI ⏰📊
 
+```text
+  ____                 _____ _   _ ___ 
+ / ___|_ __ ___  _ __ |_   _| | | |_ _|
+| |   | '__/ _ \| '_ \  | | | | | || | 
+| |___| | | (_) | | | | | | | |_| || | 
+ \____|_|  \___/|_| |_| |_|  \___/|___|
+```
+
+[![Language-Bash](https://img.shields.io/badge/Language-Bash-4EAA25?style=flat-square&logo=gnu-bash&logoColor=white)](https://www.gnu.org/software/bash/)
+[![Helper-Python](https://img.shields.io/badge/Helper-Python-3776AB?style=flat-square&logo=python&logoColor=white)](https://www.python.org/)
+[![Dependencies-None](https://img.shields.io/badge/Dependencies-None-brightgreen?style=flat-square)](#)
+[![Interface-TUI](https://img.shields.io/badge/Interface-TUI-blue?style=flat-square)](#)
+[![License-MIT](https://img.shields.io/badge/License-MIT-yellow?style=flat-square)](LICENSE)
+
 A beautiful, dependency-free terminal-based visualizer and manager for your cronjobs.
 
 `CronTUI` is a standalone, lightweight Bash utility that transforms the standard, dry crontab management experience into an interactive, color-coded visual agenda. It lets you analyze your cron scheduling patterns over days, weeks, months, and years in a clean TUI heatmap—helping you identify execution overlap and schedule conflicts instantly.
+
+---
+
+## 📽️ Demo
+
+*(To capture an animated demo of CronTUI, run `asciinema rec demo.cast`, convert it using `svg-term` or compile to a GIF, and embed it here!)*
+
+```text
+[   Interactive Demo / GIF Placeholder   ]
+```
+
+---
+
+## 🤔 Why CronTUI?
+
+- 🚫 **No Web Overhead**: Unlike heavy web-based crontab dashboards, CronTUI runs instantly in any SSH terminal session without needing to open ports, map web servers, or set up reverse proxies.
+- 🎨 **Rich TUI vs. `crontab -l`**: Standard crontab commands return unreadable lists of raw text. CronTUI interprets and plots scheduling patterns on visual, color-coded heatmaps.
+- ⚡ **No Complex Setup**: It is a single, self-contained executable with zero dependencies—no node_modules, no python virtual environments, just raw bash and the Python standard library.
+- 🛠️ **Sandboxed Testing & Safety**: Safe addition and deletion wizard prevents syntax mistakes, while the sandboxed test-run allows executing cronjobs manually with a single keystroke.
 
 ---
 
@@ -15,60 +48,6 @@ A beautiful, dependency-free terminal-based visualizer and manager for your cron
 - 📅 **Month Heatmap**: Visual month-calendar heatmap representing job density per day.
 - 🗺️ **Year Heatmap**: A stunning 3x4 grid rendering of all 12 months with day-by-day job density heatmaps.
 - 🏥 **Health & Logs**: Easily check service status (cron/crond), task count, view syslogs via `journalctl`, and view custom task logs if available.
-- 🪶 **Dependency-Free**: 100% self-contained Bash script with embedded Python helper routines. No `npm`, `pip`, or packaging tools required. Works out of the box on any Unix system with Python 3.
-
----
-
-## 📸 Visual Previews
-
-### Week Timeline
-```text
-==========================================
-           CRON WEEK TIMELINE             
-==========================================
-Hours 0 to 23 (columns left to right):
-0         6         12        18        23
-|         |         |         |         |
-
-Mon  ■■.■■.■.■■..■.....■.....  (10 jobs)
-Tue  ■■.■■.■.■■..■.....■.....  (10 jobs)
-Wed  ■■.■■.■.■■..■.....■.....  (10 jobs)
-Thu  ■■.■■.■.■■..■.....■.....  (10 jobs)
-Fri  ■■.■■.■.■■..■.....■.....  (10 jobs)
-Sat  ■■.■■.■.■■..■.....■.....  (10 jobs)
-Sun  ■■.■■.■.■■..■.....■.....  (12 jobs)
-```
-
-### Day Zoom View
-```text
-==========================================
-     CRON ZOOM VIEW - SUNDAY              
-==========================================
-Minutes 0 to 59 (columns left to right):
-0              15             30             45         59
-|              |              |              |          |
-
-00:00  ■...........................................................  multicloud-sync
-01:00  ■...........................................................  restic-lokaios
-02:00  ............................................................  
-03:00  ■.............................■.............................  restic-backup, vzdump-lokaios
-04:00  ■...........................................................  restic-sync, update-twingate
-```
-
-### Year Heatmap Grid
-```text
-========================================================================
-                    CRON YEAR HEATMAP — 2026                        
-========================================================================
-      JANUARI                   FEBRUARI                   MAART        
-Ma Di Wo Do Vr Za Zo      Ma Di Wo Do Vr Za Zo      Ma Di Wo Do Vr Za Zo
-         ■  ■  ■  ■                         ■                         ■ 
-■  ■  ■  ■  ■  ■  ■       ■  ■  ■  ■  ■  ■  ■       ■  ■  ■  ■  ■  ■  ■ 
-■  ■  ■  ■  ■  ■  ■       ■  ■  ■  ■  ■  ■  ■       ■  ■  ■  ■  ■  ■  ■ 
-■  ■  ■  ■  ■  ■  ■       ■  ■  ■  ■  ■  ■  ■       ■  ■  ■  ■  ■  ■  ■ 
-■  ■  ■  ■  ■  ■          ■  ■  ■  ■  ■  ■          ■  ■  ■  ■  ■  ■  ■ 
-                                                    ■  ■                
-```
 
 ---
 
@@ -78,13 +57,13 @@ You can install `CronTUI` as a single executable script in seconds.
 
 ### The Quick Way (One-Liner)
 ```bash
-curl -sSL https://raw.githubusercontent.com/yourusername/crontui/main/crontui | sudo tee /usr/local/bin/crontui && sudo chmod +x /usr/local/bin/crontui
+curl -sSL https://raw.githubusercontent.com/Piggy90/crontui/main/crontui | sudo tee /usr/local/bin/crontui && sudo chmod +x /usr/local/bin/crontui
 ```
 
 ### Manual Installation
 1. Clone this repository:
    ```bash
-   git clone https://github.com/yourusername/crontui.git
+   git clone https://github.com/Piggy90/crontui.git
    cd crontui
    ```
 2. Move it to your path:
@@ -95,25 +74,36 @@ curl -sSL https://raw.githubusercontent.com/yourusername/crontui/main/crontui | 
 
 ---
 
-## 🛠️ Usage
+## 🛠️ Command-Line Options
 
-Run the tool interactively:
-```bash
-crontui
+CronTUI supports direct CLI arguments for diagnostic and utility purposes:
+
+```text
+Usage:
+  crontui [options]
+
+Options:
+  -h, --help      Show this help message and exit
+  -v, --version   Show version information and exit
+  -d, --doctor    Run environment health diagnostics
 ```
 
-### Navigation
-Simply press the keys corresponding to your choice in the menu (no need to press Enter for the main selection):
-- `1` - View Active Cronjobs
-- `2` - Add a new Cronjob
-- `3` - Remove a Cronjob
-- `4` - Run a test execution
-- `5` - View cron logs
-- `7` - Run service health checks
-- `8` - Show weekly visual timeline
-- `9` - Show day zoom view (minute resolution)
-- `m` - Show monthly calendar heatmap
-- `j` - Show yearly heatmap grid
+### Environment Doctor (`crontui --doctor`)
+Runs a series of environment diagnostics checking for Python availability, service execution state, crontab permissions, and log directory mapping:
+
+```text
+==========================================
+           CRONTUI DOCTOR DIAGNOSTICS      
+==========================================
+Checking Python 3... OK (Python 3.11.2)
+Checking Cron service... OK (Active and running)
+Checking crontab access... OK (Accessible)
+Checking log directory (/var/lib/cron-notify)... OK (Exists)
+Checking digest file (/var/lib/cron-notify/runs.tsv)... OK (Exists)
+
+Summary: 0 error(s), 0 warning(s)
+✔ Your environment is ready for CronTUI!
+```
 
 ---
 
@@ -130,9 +120,31 @@ If these files/directories are not present, `CronTUI` will automatically fall ba
 
 ---
 
+## 🗺️ Roadmap
+
+We are continuously improving `CronTUI`. Here is our planned roadmap:
+
+- [ ] **Cron Conflict Detection**: Warn users if two memory-heavy or disk-heavy tasks overlap on the schedule.
+- [ ] **Live Mode**: Real-time auto-refresh of timelines and heatmaps as time passes.
+- [ ] **JSON Export**: Export the parsed schedule and active timelines to structured JSON files.
+- [ ] **TUI Filters**: Filter the week, month, and year views by specific search terms or commands.
+- [ ] **Plugin System**: Allow custom scripts to extend visual heatmaps or logging integrations.
+
+---
+
 ## 🤝 Contributing
 
-Contributions are welcome! Please feel free to open issues or submit pull requests to improve the parser, add compatibility for other shells, or expand the visualizations.
+Contributions are welcome! To contribute:
+1. **Fork** the repository.
+2. Create a new feature branch (`git checkout -b feature/amazing-feature`).
+3. Commit your changes (`git commit -m 'Add amazing feature'`).
+4. Push to the branch (`git push origin feature/amazing-feature`).
+5. Open a **Pull Request**.
+
+### Coding Style & Rules
+- Keep the main runner 100% self-contained in the `crontui` script.
+- Ensure Python helpers use only the standard library (no pip packages).
+- Verify shell syntax using `bash -n crontui` before committing.
 
 ## 📄 License
 

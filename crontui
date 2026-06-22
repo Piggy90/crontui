@@ -777,6 +777,116 @@ cron_health() {
     read -p "Press Enter to continue."
 }
 
+# Handle command line arguments
+show_help() {
+    echo -e "${YELLOW}CronTUI - Terminal-based visualizer and manager for cronjobs.${NC}"
+    echo ""
+    echo -e "Usage:"
+    echo -e "  crontui [options]"
+    echo ""
+    echo -e "Options:"
+    echo -e "  -h, --help      Show this help message and exit"
+    echo -e "  -v, --version   Show version information and exit"
+    echo -e "  -d, --doctor    Run environment health diagnostics"
+    echo ""
+    echo -e "Interactive Menu:"
+    echo -e "  Run without any arguments to start the interactive TUI menu."
+}
+
+show_version() {
+    echo "CronTUI v1.0.0"
+}
+
+run_doctor() {
+    echo -e "${CYAN}==========================================${NC}"
+    echo -e "${YELLOW}           CRONTUI DOCTOR DIAGNOSTICS      ${NC}"
+    echo -e "${CYAN}==========================================${NC}"
+    
+    local errors=0
+    local warnings=0
+
+    # 1. Check Python 3
+    echo -n "Checking Python 3... "
+    if command -v python3 >/dev/null 2>&1; then
+        local py_ver
+        py_ver=$(python3 --version 2>&1)
+        echo -e "${GREEN}OK (${py_ver})${NC}"
+    else
+        echo -e "${RED}FAILED (Python 3 is required for the yearly heatmap!)${NC}"
+        ((errors++))
+    fi
+
+    # 2. Check Cron Daemon
+    echo -n "Checking Cron service... "
+    if systemctl is-active cron >/dev/null 2>&1 || systemctl is-active crond >/dev/null 2>&1; then
+        echo -e "${GREEN}OK (Active and running)${NC}"
+    else
+        echo -e "${YELLOW}WARNING (Cron service is not running or systemctl is not available)${NC}"
+        ((warnings++))
+    fi
+
+    # 3. Check crontab access
+    echo -n "Checking crontab access... "
+    if crontab -l >/dev/null 2>&1; then
+        echo -e "${GREEN}OK (Accessible)${NC}"
+    elif [ $? -eq 1 ]; then
+        # crontab exits with 1 if no crontab file exists for the user
+        echo -e "${GREEN}OK (Accessible, but currently empty)${NC}"
+    else
+        echo -e "${RED}FAILED (Permission denied or crontab command not found)${NC}"
+        ((errors++))
+    fi
+
+    # 4. Check custom log directory
+    echo -n "Checking log directory ($LOG_DIR)... "
+    if [ -d "$LOG_DIR" ]; then
+        echo -e "${GREEN}OK (Exists)${NC}"
+    else
+        echo -e "${YELLOW}INFO (Not found, falling back to system logs)${NC}"
+    fi
+
+    # 5. Check digest file
+    echo -n "Checking digest file ($DIGEST_FILE)... "
+    if [ -f "$DIGEST_FILE" ]; then
+        echo -e "${GREEN}OK (Exists)${NC}"
+    else
+        echo -e "${YELLOW}INFO (Not found, digest menu option will be hidden)${NC}"
+    fi
+
+    echo ""
+    echo -e "${CYAN}Summary:${NC} $errors error(s), $warnings warning(s)"
+    if [ $errors -eq 0 ]; then
+        echo -e "${GREEN}✔ Your environment is ready for CronTUI!${NC}"
+        exit 0
+    else
+        echo -e "${RED}✘ Some critical requirements are missing. Please fix them before running CronTUI.${NC}"
+        exit 1
+    fi
+}
+
+case "$1" in
+    -h|--help)
+        show_help
+        exit 0
+        ;;
+    -v|--version)
+        show_version
+        exit 0
+        ;;
+    -d|--doctor)
+        run_doctor
+        exit 0
+        ;;
+    "")
+        # No arguments, proceed to main loop
+        ;;
+    *)
+        echo -e "${RED}Unknown option: $1${NC}"
+        show_help
+        exit 1
+        ;;
+esac
+
 # Main Loop
 while true; do
     clear
