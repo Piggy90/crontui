@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.1.2] - 2026-06-23
+
+### Added
+- **Interactive Visual Styling**: Colorful outputs in conflict detection (Yellow for warnings, Cyan for jobs, Red for times, Dim for dividers) with built-in `NO_COLOR` environment variable support.
+- **Command Path Toggle**: Interactive `v` key toggle in the conflict detector to switch dynamically between simplified command labels and full command paths.
+
 ## [1.1.1] - 2026-06-23
 
 ### Added

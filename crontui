@@ -783,13 +783,25 @@ cron_health() {
 }
 
 cron_conflict_detection() {
-    clear
-    python3 - << 'EOF'
+    local show_full=0
+    while true; do
+        clear
+        python3 - "$show_full" << 'EOF'
 import sys
+show_full = len(sys.argv) > 1 and sys.argv[1] == "1"
 import os
 import re
 import subprocess
 from collections import defaultdict
+
+if os.environ.get('NO_COLOR'):
+    RED = YELLOW = CYAN = DIM = NC = ""
+else:
+    RED = '\033[1;31m'
+    YELLOW = '\033[1;33m'
+    CYAN = '\033[1;36m'
+    DIM = '\033[2m'
+    NC = '\033[0m'
 
 def expand_field(field, max_val, min_val=0):
     if field == '*':
@@ -946,33 +958,52 @@ if not conflicts:
     print("Great! No scheduling conflicts detected in your weekly cron cycle.")
     print("==========================================")
 else:
-    print("==========================================")
-    print("⚠️  OVERLAPPING CRONJOBS DETECTED")
-    print("==========================================")
+    print(f"{CYAN}=========================================={NC}")
+    print(f"{YELLOW}⚠️  OVERLAPPING CRONJOBS DETECTED{NC}")
+    print(f"{CYAN}=========================================={NC}")
     print()
     print("Jobs scheduled at the exact same time:")
     print()
     
     pair_num = 1
     for cmd_tuple, times in sorted(conflicts.items(), key=lambda x: len(x[1]), reverse=True):
-        print("──────────────────────────────────────────")
-        print(f"Pair #{pair_num}")
+        print(f"{DIM}──────────────────────────────────────────{NC}")
+        print(f"Pair #{CYAN}{pair_num}{NC}")
         for cmd in cmd_tuple:
-            print(f"  • {get_clean_command(cmd)}")
+            if show_full:
+                print(f"  • {CYAN}{cmd}{NC}")
+            else:
+                print(f"  • {CYAN}{get_clean_command(cmd)}{NC}")
         print()
         print("  Overlapping times (max 10):")
         sorted_times = sorted(times)
         for t in sorted_times[:10]:
             d, h, m = t
-            print(f"    - {day_names[d]} {h:02d}:{m:02d}")
+            print(f"    - {RED}{day_names[d]} {h:02d}:{m:02d}{NC}")
         if len(sorted_times) > 10:
             print(f"    ... and {len(sorted_times) - 10} more times")
         print()
         pair_num += 1
-    print("==========================================")
+    print(f"{CYAN}=========================================={NC}")
 EOF
-    echo ""
-    read -p "Press Enter to continue…"
+        echo ""
+        if [ "$show_full" -eq 0 ]; then
+            read -n 1 -r -p "Press Enter to continue, or 'v' to view full commands…" key
+            echo ""
+            if [[ "$key" =~ ^[vV]$ ]]; then
+                show_full=1
+                continue
+            fi
+        else
+            read -n 1 -r -p "Press Enter to continue, or 'v' to view cleaned commands…" key
+            echo ""
+            if [[ "$key" =~ ^[vV]$ ]]; then
+                show_full=0
+                continue
+            fi
+        fi
+        break
+    done
 }
 
 # Handle command line arguments
@@ -992,7 +1023,7 @@ show_help() {
 }
 
 show_version() {
-    echo "CronTUI v1.1.1"
+    echo "CronTUI v1.1.2"
 }
 
 run_doctor() {
