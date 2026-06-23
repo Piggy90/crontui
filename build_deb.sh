@@ -5,7 +5,7 @@
 
 # Package configuration
 PKG_NAME="crontui"
-VERSION="1.0.0"
+VERSION="1.1.0"
 ARCH="all"
 PKG_DIR="${PKG_NAME}_${VERSION}_${ARCH}"
 
