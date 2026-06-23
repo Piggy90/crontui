@@ -786,6 +786,8 @@ cron_conflict_detection() {
     clear
     python3 - << 'EOF'
 import sys
+import os
+import re
 import subprocess
 from collections import defaultdict
 
@@ -816,6 +818,55 @@ def expand_field(field, max_val, min_val=0):
             except ValueError:
                 pass
     return sorted(list(result))
+
+def clean_raw_command(cmd):
+    bash_match = re.match(r'^(?:/bin/)?bash\s+-c\s+[\"\'](.+)[\"\']\s*$', cmd)
+    if bash_match:
+        cmd = bash_match.group(1)
+        
+    cmd = re.sub(r'^(?:/usr/bin/)?python3?\s+', '', cmd)
+    cmd = re.sub(r'^(?:/usr/bin/)?php\s+', '', cmd)
+    
+    parts = re.split(r'(\s*(?:&&|;|\|\||\|)\s*)', cmd)
+    cleaned_parts = []
+    for part in parts:
+        if part.strip() in ['&&', ';', '||', '|']:
+            cleaned_parts.append(part)
+        else:
+            sub_parts = part.strip().split(None, 1)
+            if sub_parts:
+                exe = sub_parts[0]
+                if '/' in exe:
+                    exe = os.path.basename(exe)
+                
+                rest = ' ' + sub_parts[1] if len(sub_parts) > 1 else ''
+                rest = re.sub(r'/root/scripts/([^\s\'\"]+)', r'\1', rest)
+                rest = re.sub(r'/usr/local/bin/([^\s\'\"]+)', r'\1', rest)
+                cleaned_parts.append(f"{exe}{rest}")
+            else:
+                cleaned_parts.append(part)
+                
+    return "".join(cleaned_parts).strip()
+
+def get_clean_command(cmd):
+    cmd = cmd.strip()
+    notify_match = re.search(r'cron-notify\.sh\s+(?:--success\s+)?([^\s\-]+)(?:\s+--\s+(.+))?', cmd)
+    if notify_match:
+        label = notify_match.group(1)
+        actual_cmd = notify_match.group(2)
+        if actual_cmd:
+            cleaned_actual = clean_raw_command(actual_cmd)
+            return f"{label} ({cleaned_actual})"
+        return label
+    
+    digest_match = re.search(r'CRON_DIGEST_LABEL=([^\s]+)\s+(.+)', cmd)
+    if digest_match:
+        label = digest_match.group(1)
+        actual_cmd = digest_match.group(2)
+        cleaned_actual = clean_raw_command(actual_cmd)
+        return f"cron-digest: {label} ({cleaned_actual})"
+        
+    return clean_raw_command(cmd)
 
 try:
     proc = subprocess.run(['crontab', '-l'], capture_output=True, text=True, check=True)
@@ -907,7 +958,7 @@ else:
         print("──────────────────────────────────────────")
         print(f"Pair #{pair_num}")
         for cmd in cmd_tuple:
-            print(f"  • {cmd}")
+            print(f"  • {get_clean_command(cmd)}")
         print()
         print("  Overlapping times (max 10):")
         sorted_times = sorted(times)

@@ -195,6 +195,10 @@ Summary: 13 passed, 0 failed
 We are continuously improving `CronTUI`. Here is our planned roadmap:
 
 - [x] **Cron Conflict Detection**: Warn users if two memory-heavy or disk-heavy tasks overlap on the schedule.
+- [ ] **Command De-cluttering**: Simplified command view that extracts the actual script/task name (in progress).
+- [ ] **Resource Clash Risk Estimation**: Automatically flag concurrent disk-heavy, CPU-heavy, or network-heavy tasks.
+- [ ] **Estimated Duration Overlaps**: Incorporate historical execution durations to find overlaps during run time, not just start time.
+- [ ] **Interactive Planner**: Allow users to safely shift conflicting jobs directly from the TUI.
 - [ ] **Live Mode**: Real-time auto-refresh of timelines and heatmaps as time passes.
 - [ ] **JSON Export**: Export the parsed schedule and active timelines to structured JSON files.
 - [ ] **TUI Filters**: Filter the week, month, and year views by specific search terms or commands.
