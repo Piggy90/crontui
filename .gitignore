@@ -1,2 +1,14 @@
 crontui_*_all/
 crontui_*_all.deb
+backups/
+x86_64/
+noarch/
+src/
+pkg/
+dist/
+*.apk
+*.deb
+*.tar.gz
+ROADMAP.md
+.github_token
+
