@@ -881,40 +881,47 @@ for (d, h, m), cmd_list in schedule.items():
 
 day_names = {1: "Mon", 2: "Tue", 3: "Wed", 4: "Thu", 5: "Fri", 6: "Sat", 7: "Sun"}
 
-print("==========================================")
-print("          CRON CONFLICT DETECTION         ")
-print("==========================================")
-
-if every_minute_jobs:
-    print("Info: The following daemon-like jobs run every minute")
-    print("      (excluded from timeline conflict check to avoid noise):")
-    for cmd in every_minute_jobs:
-        short_cmd = cmd[:50] + '...' if len(cmd) > 53 else cmd
-        print(f"  - {short_cmd}")
-    print()
-
 if not conflicts:
+    print("==========================================")
+    print("          CRON CONFLICT DETECTION         ")
+    print("==========================================")
+    if every_minute_jobs:
+        print("Info: The following daemon-like jobs run every minute")
+        print("      (excluded from timeline conflict check to avoid noise):")
+        for cmd in every_minute_jobs:
+            short_cmd = cmd[:50] + '...' if len(cmd) > 53 else cmd
+            print(f"  - {short_cmd}")
+        print()
     print("Great! No scheduling conflicts detected in your weekly cron cycle.")
+    print("==========================================")
 else:
-    print("Warning: Detected overlapping cronjobs scheduled at the exact same time:")
+    print("==========================================")
+    print("⚠️  OVERLAPPING CRONJOBS DETECTED")
+    print("==========================================")
     print()
-    for cmd_tuple, times in conflicts.items():
-        print("------------------------------------------")
-        print("Overlapping Jobs:")
+    print("Jobs scheduled at the exact same time:")
+    print()
+    
+    pair_num = 1
+    for cmd_tuple, times in sorted(conflicts.items(), key=lambda x: len(x[1]), reverse=True):
+        print("──────────────────────────────────────────")
+        print(f"Pair #{pair_num}")
         for cmd in cmd_tuple:
-            print(f"  * {cmd}")
-        print("\nOverlap Times (max 10 shown):")
+            print(f"  • {cmd}")
+        print()
+        print("  Overlapping times (max 10):")
         sorted_times = sorted(times)
         for t in sorted_times[:10]:
             d, h, m = t
-            print(f"  - {day_names[d]} at {h:02d}:{m:02d}")
+            print(f"    - {day_names[d]} {h:02d}:{m:02d}")
         if len(sorted_times) > 10:
-            print(f"  ... and {len(sorted_times) - 10} more times")
+            print(f"    ... and {len(sorted_times) - 10} more times")
         print()
-print("==========================================")
+        pair_num += 1
+    print("==========================================")
 EOF
     echo ""
-    read -p "Press Enter to return."
+    read -p "Press Enter to continue…"
 }
 
 # Handle command line arguments
