@@ -1,4 +1,4 @@
-# CronTUI ⏰📊
+# CronTUI 
 
 ```text
   ____                 _____ _   _ ___ 
@@ -20,43 +20,43 @@ A beautiful, dependency-free terminal-based visualizer and manager for your cron
 
 ---
 
-## 📽️ Demo & Showcase
+## Demo & Showcase
 
 ![CronTUI Demo](demo.gif)
 
-### 📆 Week Timeline
+### Week Timeline
 Shows a horizontal weekly grid mapped to specific hour slots when jobs run. Ideal for recognizing scheduling density across different days.
 
-### 🔍 Day Zoom View
+### Day Zoom View
 A detailed hour-by-hour minute timeline showing precisely when jobs run (down to the minute) alongside consolidated command labels.
 
-### 📅 Month & Year Heatmaps
+### Month & Year Heatmaps
 A calendar representation (rendered in standard 3x4 columns for the yearly view) using color-coded densities (`■`) to highlight active cron days.
 
 ---
 
-## 🤔 Why CronTUI?
+## Why CronTUI?
 
-- 🚫 **No Web Overhead**: Unlike heavy web-based crontab dashboards, CronTUI runs instantly in any SSH terminal session without needing to open ports, map web servers, or set up reverse proxies.
-- 🎨 **Rich TUI vs. `crontab -l`**: Standard crontab commands return unreadable lists of raw text. CronTUI interprets and plots scheduling patterns on visual, color-coded heatmaps.
-- ⚡ **No Complex Setup**: It is a single, self-contained executable with zero dependencies—no node_modules, no python virtual environments, just raw bash and the Python standard library.
-- 🛠️ **Sandboxed Testing & Safety**: Safe addition and deletion wizard prevents syntax mistakes, while the sandboxed test-run allows executing cronjobs manually with a single keystroke.
-
----
-
-## 🌟 Features
-
-- 📂 **Safe Cron Management**: View active cronjobs, add new ones with validation, and safely remove them by index.
-- ⚡ **On-Demand Testing**: Run any cronjob command manually in a sandbox environment right from the CLI.
-- 📆 **Week Timeline**: View a horizontal hour-by-hour weekly grid mapping when tasks are scheduled.
-- 🔍 **Day Zoom View**: Drill down into a specific day to see a 60-minute horizontal timeline showing exactly which minute a job runs, complete with job command labels.
-- 📅 **Month Heatmap**: Visual month-calendar heatmap representing job density per day.
-- 🗺️ **Year Heatmap**: A stunning 3x4 grid rendering of all 12 months with day-by-day job density heatmaps.
-- 🏥 **Health & Logs**: Easily check service status (cron/crond), task count, view syslogs via `journalctl`, and view custom task logs if available.
+- **No Web Overhead**: Unlike heavy web-based crontab dashboards, CronTUI runs instantly in any SSH terminal session without needing to open ports, map web servers, or set up reverse proxies.
+- **Rich TUI vs. `crontab -l`**: Standard crontab commands return unreadable lists of raw text. CronTUI interprets and plots scheduling patterns on visual, color-coded heatmaps.
+- **No Complex Setup**: It is a single, self-contained executable with zero dependencies—no node_modules, no python virtual environments, just raw bash and the Python standard library.
+- **Sandboxed Testing & Safety**: Safe addition and deletion wizard prevents syntax mistakes, while the sandboxed test-run allows executing cronjobs manually with a single keystroke.
 
 ---
 
-## 🚀 Installation
+## Features
+
+- **Safe Cron Management**: View active cronjobs, add new ones with validation, and safely remove them by index.
+- **On-Demand Testing**: Run any cronjob command manually in a sandbox environment right from the CLI.
+- **Week Timeline**: View a horizontal hour-by-hour weekly grid mapping when tasks are scheduled.
+- **Day Zoom View**: Drill down into a specific day to see a 60-minute horizontal timeline showing exactly which minute a job runs, complete with job command labels.
+- **Month Heatmap**: Visual month-calendar heatmap representing job density per day.
+- **Year Heatmap**: A stunning 3x4 grid rendering of all 12 months with day-by-day job density heatmaps.
+- **Health & Logs**: Easily check service status (cron/crond), task count, view syslogs via `journalctl`, and view custom task logs if available.
+
+---
+
+## Installation
 
 You can install `CronTUI` as a single executable script in seconds.
 
@@ -97,7 +97,7 @@ Download or build a `.deb` package for native package management:
 
 ---
 
-## 🛠️ Command-Line Options
+## Command-Line Options
 
 CronTUI supports direct CLI arguments for diagnostic and utility purposes:
 
@@ -125,12 +125,12 @@ Checking log directory (/var/lib/cron-notify)... OK (Exists)
 Checking digest file (/var/lib/cron-notify/runs.tsv)... OK (Exists)
 
 Summary: 0 error(s), 0 warning(s)
-✔ Your environment is ready for CronTUI!
+Your environment is ready for CronTUI!
 ```
 
 ---
 
-## ⚙️ Configuration
+## Configuration
 
 `CronTUI` can be configured using environment variables or a local configuration file. 
 
@@ -157,7 +157,7 @@ If these files/directories are not present, `CronTUI` will automatically fall ba
 
 ---
 
-## 🧪 Test Suite
+## Test Suite
 
 CronTUI includes an automated test suite to ensure its parser, calendar calculations, and helpers are working correctly. 
 
@@ -170,26 +170,26 @@ Example test output:
 ```text
 Running CronTUI Unit Tests...
 ============================================================
-✔ PASS: dow_to_name 1 -> Mon
-✔ PASS: dow_to_name 7 -> Sun
-✔ PASS: dow_to_name 0 -> Sun
-✔ PASS: dow_to_name 6 -> Sat
-✔ PASS: in_list 3 in '1 2 3 4' -> true (0)
-✔ PASS: in_list 5 in '1 2 3 4' -> false (1)
-✔ PASS: expand_field */6 max 23
-✔ PASS: expand_field 1-5 max 7
-✔ PASS: expand_field 1,3,5 max 7
-✔ PASS: expand_field * max 3
-✔ PASS: get_job_label with --success flag
-✔ PASS: get_job_label with CRON_DIGEST_LABEL
-✔ PASS: get_job_label fallback to basename
+PASS: dow_to_name 1 -> Mon
+PASS: dow_to_name 7 -> Sun
+PASS: dow_to_name 0 -> Sun
+PASS: dow_to_name 6 -> Sat
+PASS: in_list 3 in '1 2 3 4' -> true (0)
+PASS: in_list 5 in '1 2 3 4' -> false (1)
+PASS: expand_field */6 max 23
+PASS: expand_field 1-5 max 7
+PASS: expand_field 1,3,5 max 7
+PASS: expand_field * max 3
+PASS: get_job_label with --success flag
+PASS: get_job_label with CRON_DIGEST_LABEL
+PASS: get_job_label fallback to basename
 ============================================================
 Summary: 13 passed, 0 failed
 ```
 
 ---
 
-## 🗺️ Roadmap
+## Roadmap
 
 We are continuously improving `CronTUI`. Here is our planned roadmap:
 
@@ -201,7 +201,7 @@ We are continuously improving `CronTUI`. Here is our planned roadmap:
 
 ---
 
-## 🤝 Contributing
+## Contributing
 
 Contributions are welcome! To contribute:
 1. **Fork** the repository.
@@ -216,6 +216,6 @@ Contributions are welcome! To contribute:
 - Verify shell syntax using `bash -n crontui` before committing.
 - Run unit tests with `./test.sh` and ensure all pass before submitting a PR.
 
-## 📄 License
+## License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
