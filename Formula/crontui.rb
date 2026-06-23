@@ -1,8 +1,8 @@
 class Crontui < Formula
   desc "Terminal-based visualizer and manager for cronjobs"
   homepage "https://github.com/Piggy90/crontui"
-  url "https://github.com/Piggy90/crontui/archive/refs/tags/v1.0.0.tar.gz"
-  sha256 "0a47cf7aa8184f8a65a1abb99ff88050313741680b7af862fb91ffb612ccf0e0"
+  url "https://github.com/Piggy90/crontui/archive/refs/tags/v1.1.0.tar.gz"
+  sha256 "0e80ebf285d27ba291c505d73ae6ddd86462d0334e16700b0794ba8732d6c375"
   license "MIT"
 
   depends_on "python"
