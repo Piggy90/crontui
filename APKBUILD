@@ -1,7 +1,7 @@
 # Contributor: Piggy90 <piggy90@github.com>
 # Maintainer: Piggy90 <piggy90@github.com>
 pkgname=crontui
-pkgver=1.1.0
+pkgver=1.1.1
 pkgrel=0
 pkgdesc="Terminal-based visualizer and manager for cronjobs"
 url="https://github.com/Piggy90/crontui"
@@ -22,6 +22,7 @@ package() {
 
 
 
+
 sha512sums="
-80dd2aff4547bf336492eb4879b1c64faca59abb9eb2a9f1deae5367c34461447c4833519802d90ef4c304dcb7b08cc9fbc8c3f018e7f78ad3b15df73124e20a  crontui
+886142639febc142f1f31bd72900f7e315c278e3679fdad5919d8e0aa40b1d7652d064a00c4021c07b682442bb7ec56fa7e36762dcd0eba56f8313ab566f169e  crontui
 "

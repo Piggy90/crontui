@@ -992,7 +992,7 @@ show_help() {
 }
 
 show_version() {
-    echo "CronTUI v1.1.0"
+    echo "CronTUI v1.1.1"
 }
 
 run_doctor() {

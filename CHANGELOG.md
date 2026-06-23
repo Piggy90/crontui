@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.1.1] - 2026-06-23
+
+### Added
+- **Command De-cluttering**: Cleans up and simplifies cronjob command paths and notification wrappers (such as `cron-notify.sh` or complex bash execution subshells) in the interactive conflict visualizer for improved readability.
+
 ## [1.1.0] - 2026-06-23
 
 ### Added
