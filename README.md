@@ -48,6 +48,7 @@ A calendar representation (rendered in standard 3x4 columns for the yearly view)
 
 - **Safe Cron Management**: View active cronjobs, add new ones with validation, and safely remove them by index.
 - **On-Demand Testing**: Run any cronjob command manually in a sandbox environment right from the CLI.
+- **Conflict Detection**: Detect scheduling conflicts by identifying overlapping cronjobs scheduled at the exact same minute in your weekly cycle.
 - **Week Timeline**: View a horizontal hour-by-hour weekly grid mapping when tasks are scheduled.
 - **Day Zoom View**: Drill down into a specific day to see a 60-minute horizontal timeline showing exactly which minute a job runs, complete with job command labels.
 - **Month Heatmap**: Visual month-calendar heatmap representing job density per day.
@@ -193,7 +194,7 @@ Summary: 13 passed, 0 failed
 
 We are continuously improving `CronTUI`. Here is our planned roadmap:
 
-- [ ] **Cron Conflict Detection**: Warn users if two memory-heavy or disk-heavy tasks overlap on the schedule.
+- [x] **Cron Conflict Detection**: Warn users if two memory-heavy or disk-heavy tasks overlap on the schedule.
 - [ ] **Live Mode**: Real-time auto-refresh of timelines and heatmaps as time passes.
 - [ ] **JSON Export**: Export the parsed schedule and active timelines to structured JSON files.
 - [ ] **TUI Filters**: Filter the week, month, and year views by specific search terms or commands.

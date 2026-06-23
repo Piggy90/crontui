@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.1.0] - 2026-06-23
+
+### Added
+- **Cron Conflict Detection**: A new interactive menu option `c` that parses the crontab and flags scheduling conflicts where multiple cronjobs are scheduled at the exact same minute within the weekly cycle. It highlights the overlapping jobs and displays the list of conflict times (excluding high-frequency daemon-like jobs that run every minute to prevent visual noise).
+
 ## [1.0.0] - 2026-06-22
 
 ### Added
