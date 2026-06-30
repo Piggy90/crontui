@@ -1234,7 +1234,7 @@ show_help() {
 }
 
 show_version() {
-    echo "CronTUI v1.2.0"
+    echo "CronTUI v1.2.1-dev"
 }
 
 run_doctor() {
