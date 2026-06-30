@@ -7,10 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [1.1.3-dev] - 2026-06-23
+## [1.2.0] - 2026-06-30
 
 ### Added
-- Work in progress for next release.
+- **In-place Cron Editing**: Added interactive menu option `3` to edit existing cronjobs (schedule expression, command, and status) in-place without deleting and recreating.
+- **Task Suspend and Resume**: Added interactive menu option `5` to toggle cronjob active state (`AAN`/`UIT`) by comment-prefixing (`# `) directly in the user's crontab while fully preserving formatting and surrounding comment blocks.
 
 ## [1.1.2] - 2026-06-23
 

@@ -560,6 +560,217 @@ EOF
     read -p "Press Enter to return."
 }
 
+is_cronjob() {
+    local line="$1"
+    [ -z "$line" ] && return 1
+    
+    local clean
+    clean=$(echo "$line" | sed -E 's/^[[:space:]]*#[[:space:]]*//' | sed -E 's/^[[:space:]]+//')
+    [ -z "$clean" ] && return 1
+    
+    if [[ "$clean" =~ ^@[a-zA-Z]+[[:space:]]+.+ ]]; then
+        local first_token
+        first_token=$(echo "$clean" | awk '{print $1}')
+        if [[ "$first_token" =~ ^@(reboot|yearly|annually|monthly|weekly|daily|midnight|hourly)$ ]]; then
+            return 0
+        fi
+        return 1
+    fi
+    
+    local parts=()
+    read -r -a parts <<< "$clean"
+    [ "${#parts[@]}" -lt 6 ] && return 1
+    
+    local i
+    for i in {0..4}; do
+        local part="${parts[$i]}"
+        if [[ ! "$part" =~ ^[0-9\*,\/\-]+$ ]]; then
+            return 1
+        fi
+    done
+    
+    return 0
+}
+
+cron_toggle() {
+    clear
+    echo -e "${CYAN}==========================================${NC}"
+    echo -e "${YELLOW}       TOGGLE CRONJOB STATE (ON/OFF)      ${NC}"
+    echo -e "${CYAN}==========================================${NC}"
+    
+    local crontab_lines=()
+    while IFS= read -r line; do
+        crontab_lines+=("$line")
+    done < <(crontab -l 2>/dev/null)
+    
+    local job_indices=()
+    local job_labels=()
+    local job_states=()
+    
+    local i=1
+    for idx in "${!crontab_lines[@]}"; do
+        local line="${crontab_lines[$idx]}"
+        if is_cronjob "$line"; then
+            job_indices+=("$idx")
+            if [[ "$line" =~ ^[[:space:]]*# ]]; then
+                job_states+=("disabled")
+                local clean_line
+                clean_line=$(echo "$line" | sed -E 's/^[[:space:]]*#[[:space:]]*//')
+                printf "  %2d) [${RED}UIT${NC}] %s\n" $i "$clean_line"
+                job_labels+=("$clean_line")
+            else
+                job_states+=("enabled")
+                printf "  %2d) [${GREEN}AAN${NC}] %s\n" $i "$line"
+                job_labels+=("$line")
+            fi
+            ((i++))
+        fi
+    done
+    
+    local num_jobs=${#job_indices[@]}
+    if [ $num_jobs -eq 0 ]; then
+        echo -e "${YELLOW}No cronjobs found to toggle.${NC}"
+        echo ""
+        read -p "Press Enter to continue."
+        return
+    fi
+    
+    echo -e ""
+    echo -e "   0) Cancel"
+    echo -e "${CYAN}==========================================${NC}"
+    read -p "Choose a job number to toggle: " num
+    
+    if [ "$num" = "0" ] || [ -z "$num" ]; then
+        return
+    elif [[ "$num" =~ ^[1-9][0-9]*$ ]] && [ "$num" -le "$num_jobs" ]; then
+        local target_idx="${job_indices[$((num-1))]}"
+        local current_line="${crontab_lines[$target_idx]}"
+        local new_line
+        
+        if [ "${job_states[$((num-1))]}" = "enabled" ]; then
+            new_line="# $current_line"
+            echo -e "\nDisabling job..."
+        else
+            new_line=$(echo "$current_line" | sed -E 's/^[[:space:]]*#[[:space:]]*//')
+            echo -e "\nEnabling job..."
+        fi
+        
+        crontab_lines[$target_idx]="$new_line"
+        printf "%s\n" "${crontab_lines[@]}" | crontab -
+        echo -e "${GREEN}✔ Cronjob state successfully toggled!${NC}"
+    else
+        echo -e "\n${RED}Invalid choice!${NC}"
+    fi
+    read -p "Press Enter to continue."
+}
+
+cron_edit() {
+    clear
+    echo -e "${CYAN}==========================================${NC}"
+    echo -e "${YELLOW}              EDIT CRONJOB                ${NC}"
+    echo -e "${CYAN}==========================================${NC}"
+    
+    local crontab_lines=()
+    while IFS= read -r line; do
+        crontab_lines+=("$line")
+    done < <(crontab -l 2>/dev/null)
+    
+    local job_indices=()
+    local job_labels=()
+    
+    local i=1
+    for idx in "${!crontab_lines[@]}"; do
+        local line="${crontab_lines[$idx]}"
+        if is_cronjob "$line"; then
+            job_indices+=("$idx")
+            local clean_line
+            if [[ "$line" =~ ^[[:space:]]*# ]]; then
+                clean_line=$(echo "$line" | sed -E 's/^[[:space:]]*#[[:space:]]*//')
+                printf "  %2d) [${RED}UIT${NC}] %s\n" $i "$clean_line"
+            else
+                clean_line="$line"
+                printf "  %2d) [${GREEN}AAN${NC}] %s\n" $i "$line"
+            fi
+            job_labels+=("$clean_line")
+            ((i++))
+        fi
+    done
+    
+    local num_jobs=${#job_indices[@]}
+    if [ $num_jobs -eq 0 ]; then
+        echo -e "${YELLOW}No cronjobs found to edit.${NC}"
+        echo ""
+        read -p "Press Enter to continue."
+        return
+    fi
+    
+    echo -e ""
+    echo -e "   0) Cancel"
+    echo -e "${CYAN}==========================================${NC}"
+    read -p "Choose a job number to edit: " num
+    
+    if [ "$num" = "0" ] || [ -z "$num" ]; then
+        return
+    elif [[ "$num" =~ ^[1-9][0-9]*$ ]] && [ "$num" -le "$num_jobs" ]; then
+        local target_idx="${job_indices[$((num-1))]}"
+        local current_line="${crontab_lines[$target_idx]}"
+        
+        local is_disabled=false
+        local clean_line="$current_line"
+        if [[ "$current_line" =~ ^[[:space:]]*# ]]; then
+            is_disabled=true
+            clean_line=$(echo "$current_line" | sed -E 's/^[[:space:]]*#[[:space:]]*//')
+        fi
+        
+        local schedule=""
+        local command=""
+        if [[ "$clean_line" =~ ^@ ]]; then
+            schedule=$(echo "$clean_line" | awk '{print $1}')
+            command=$(echo "$clean_line" | awk '{$1=""; print $0}' | sed -E 's/^[[:space:]]+//')
+        else
+            schedule=$(echo "$clean_line" | awk '{print $1, $2, $3, $4, $5}')
+            command=$(echo "$clean_line" | awk '{$1=$2=$3=$4=$5=""; print $0}' | sed -E 's/^[[:space:]]+//')
+        fi
+        
+        clear
+        echo -e "${CYAN}==========================================${NC}"
+        echo -e "${YELLOW}              EDIT CRONJOB                ${NC}"
+        echo -e "${CYAN}==========================================${NC}"
+        echo -e "Current schedule: ${YELLOW}$schedule${NC}"
+        echo -e "Current command:  ${YELLOW}$command${NC}"
+        echo -e "Current status:   $( [ "$is_disabled" = true ] && echo -e "${RED}UIT${NC}" || echo -e "${GREEN}AAN${NC}" )"
+        echo -e "${CYAN}------------------------------------------${NC}"
+        echo -e "Leave empty to keep current values."
+        echo ""
+        
+        read -p "New Schedule (Cron expression): " new_schedule
+        read -p "New Command: " new_command
+        read -p "New Status (1 = AAN, 0 = UIT, empty = keep current): " new_status
+        
+        local final_schedule="${new_schedule:-$schedule}"
+        local final_command="${new_command:-$command}"
+        
+        local final_disabled="$is_disabled"
+        if [ "$new_status" = "1" ]; then
+            final_disabled=false
+        elif [ "$new_status" = "0" ]; then
+            final_disabled=true
+        fi
+        
+        local final_line="$final_schedule $final_command"
+        if [ "$final_disabled" = true ]; then
+            final_line="# $final_line"
+        fi
+        
+        crontab_lines[$target_idx]="$final_line"
+        printf "%s\n" "${crontab_lines[@]}" | crontab -
+        echo -e "\n${GREEN}✔ Cronjob successfully updated!${NC}"
+    else
+        echo -e "\n${RED}Invalid choice!${NC}"
+    fi
+    read -p "Press Enter to continue."
+}
+
 cron_view() {
     clear
     echo -e "${CYAN}--- Active Cronjobs in crontab ---${NC}"
@@ -1023,7 +1234,7 @@ show_help() {
 }
 
 show_version() {
-    echo "CronTUI v1.1.3-dev"
+    echo "CronTUI v1.2.0"
 }
 
 run_doctor() {
@@ -1125,15 +1336,17 @@ if [ "${BASH_SOURCE[0]}" = "$0" ]; then
         echo -e "${CYAN}==========================================${NC}"
         echo -e "  1) View Active Cronjobs"
         echo -e "  2) Add Cronjob"
-        echo -e "  3) Remove Cronjob"
-        echo -e "  4) Test-Run Cronjob"
-        echo -e "  5) View Cron Logs"
+        echo -e "  3) Edit Cronjob"
+        echo -e "  4) Remove Cronjob"
+        echo -e "  5) Toggle Cronjob State (Suspend/Resume)"
+        echo -e "  6) Test-Run Cronjob"
+        echo -e "  7) View Cron Logs"
         if [ -f "$DIGEST_FILE" ]; then
-            echo -e "  6) View Cron-Digest Report"
+            echo -e "  8) View Cron-Digest Report"
         fi
-        echo -e "  7) Run Healthcheck"
-        echo -e "  8) Week Timeline view"
-        echo -e "  9) Day Zoom view"
+        echo -e "  9) Run Healthcheck"
+        echo -e "  w) Week Timeline view"
+        echo -e "  d) Day Zoom view"
         echo -e "  m) Month Heatmap calendar"
         echo -e "  j) Year Heatmap calendar"
         echo -e "  c) Check for Cron Conflicts"
@@ -1146,19 +1359,21 @@ if [ "${BASH_SOURCE[0]}" = "$0" ]; then
         case $choice in
             1) cron_view ;;
             2) cron_add ;;
-            3) cron_remove ;;
-            4) cron_test ;;
-            5) cron_logs ;;
-            6) 
+            3) cron_edit ;;
+            4) cron_remove ;;
+            5) cron_toggle ;;
+            6) cron_test ;;
+            7) cron_logs ;;
+            8) 
                 if [ -f "$DIGEST_FILE" ]; then
                     cron_digest
                 else
                     echo -e "${RED}Invalid choice!${NC}"; sleep 1
                 fi
                 ;;
-            7) cron_health ;;
-            8) cron_timeline_week ;;
-            9) cron_zoom_day ;;
+            9) cron_health ;;
+            w|W) cron_timeline_week ;;
+            d|D) cron_zoom_day ;;
             m|M) cron_month_view ;;
             j|J) cron_year_view ;;
             c|C) cron_conflict_detection ;;
